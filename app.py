@@ -43,11 +43,11 @@ st.markdown('<p class="title">📊 Advanced Stock Market Forecasting Dashboard</
 col1, col2 = st.columns([1, 3])
 
 with col1:
-    selected_company = st.selectbox("Select a company:", valid_companies)
-    model_choice = st.radio("Select Model:", ["Extra Trees", "Random Forest"], horizontal=True)
+    selected_company = st.selectbox("Select a Company:", valid_companies)
+    model_choice = st.radio("Select Forecasting Model:", ["Extra Trees", "Random Forest"], horizontal=True)
     
 with col2:
-    st.write("### Stock Overview")
+    st.write("### Stock Data Overview")
     company_data = data[data['name'] == selected_company]
     company_data = company_data.sort_index()
     st.dataframe(company_data.tail(10).style.format(precision=2))
@@ -90,12 +90,13 @@ col3.metric("R² Score", f"{r2:.2f}")
 col4.metric("Accuracy", f"{accuracy:.2%}")
 
 # Forecast Next 15 Days
+forecast_dates = pd.date_range(start=company_data.index[-1], periods=16, freq='B')[1:]
 future_X = X_test.iloc[-15:, :]
 future_forecast = model.predict(future_X)
 future_forecast = np.round(future_forecast, 2)
 
-# Display Forecasted Values
-forecast_df = pd.DataFrame({"Day": range(1, 16), "Forecasted Close": future_forecast})
+# Display Forecasted Values with Dates
+forecast_df = pd.DataFrame({"Date": forecast_dates, "Forecasted Close": future_forecast})
 st.subheader("📅 15-Day Forecast")
 st.dataframe(forecast_df.style.format({"Forecasted Close": "{:.2f}"}))
 
