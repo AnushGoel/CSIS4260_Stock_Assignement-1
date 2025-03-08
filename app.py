@@ -56,15 +56,22 @@ model.fit(X_train, y_train)
 
 # Predictions & Metrics
 y_pred = model.predict(X_test)
-metrics = {
-    "MAE": mean_absolute_error(y_test, y_pred),
-    "RMSE": np.sqrt(mean_squared_error(y_test, y_pred)),
-    "R² Score": r2_score(y_test, y_pred)
-}
+mae = mean_absolute_error(y_test, y_pred)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)
 
-# Display Metrics
+# Display Metrics in One Row
 st.subheader("📈 Model Performance Metrics")
-st.write(pd.DataFrame(metrics, index=["Value"]).T.style.format("{:.2f}"))
+st.markdown(
+    f"""
+    <div style="display: flex; justify-content: space-around; font-size: 20px; font-weight: bold; padding: 10px;">
+        <div>📉 MAE: {mae:.2f}</div>
+        <div>📊 RMSE: {rmse:.2f}</div>
+        <div>📈 R² Score: {r2:.2f}</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # Forecast Next 15 Days
 forecast_dates = company_data['date'].iloc[-15:].values
