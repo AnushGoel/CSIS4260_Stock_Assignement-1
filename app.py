@@ -18,6 +18,7 @@ st.set_page_config(page_title="Stock Market Dashboard", layout="wide")
 def load_data():
     data = pd.read_parquet("data.parquet")
     data = data.dropna()  # Drop null values
+    data = data[data['date'] > '1970-01-01']  # Remove incorrect default dates
     return data
 
 data = load_data()
@@ -49,8 +50,8 @@ with col1:
 with col2:
     st.write("### Stock Data Overview")
     company_data = data[data['name'] == selected_company]
-    company_data = company_data.sort_index()
-    company_data.index = pd.to_datetime(company_data.index)  # Ensure index is in datetime format
+    company_data = company_data.sort_values(by='date')
+    company_data['date'] = pd.to_datetime(company_data['date'])  # Ensure date is in datetime format
     st.dataframe(company_data.tail(10).style.format(precision=2))
 
 # Feature Selection
@@ -91,7 +92,7 @@ col3.metric("R² Score", f"{r2:.2f}")
 col4.metric("Accuracy", f"{accuracy:.2%}")
 
 # Forecast Next 15 Days
-forecast_dates = company_data.index[-15:]  # Use actual dataset dates
+forecast_dates = company_data['date'].iloc[-15:].values  # Use actual dataset dates
 future_X = X.iloc[-15:, :]
 future_forecast = model.predict(future_X)
 future_forecast = np.round(future_forecast, 2)
@@ -109,7 +110,7 @@ st.plotly_chart(forecast_fig, use_container_width=True)
 
 # Candlestick Chart
 st.subheader("📊 Candlestick Chart")
-candlestick_fig = go.Figure(data=[go.Candlestick(x=company_data.index,
+candlestick_fig = go.Figure(data=[go.Candlestick(x=company_data['date'],
                                                   open=company_data['open'],
                                                   high=company_data['high'],
                                                   low=company_data['low'],
@@ -118,7 +119,7 @@ st.plotly_chart(candlestick_fig, use_container_width=True)
 
 # Volume Analysis
 st.subheader("📊 Trading Volume Over Time")
-st.line_chart(company_data['volume'])
+st.line_chart(company_data[['date', 'volume']].set_index('date'))
 
 # RSI Indicator
 st.subheader("📈 Relative Strength Index (RSI)")
@@ -129,10 +130,10 @@ avg_gain = pd.Series(gain).rolling(window=14).mean()
 avg_loss = pd.Series(loss).rolling(window=14).mean()
 rs = avg_gain / avg_loss
 rsi = 100 - (100 / (1 + rs))
-st.line_chart(rsi)
+st.line_chart(pd.DataFrame({'date': company_data['date'], 'RSI': rsi}).set_index('date'))
 
 # MACD Indicator
 st.subheader("📉 MACD Indicator")
 company_data['MACD_Line'] = company_data['close'].ewm(span=12, adjust=False).mean() - company_data['close'].ewm(span=26, adjust=False).mean()
 company_data['Signal_Line'] = company_data['MACD_Line'].ewm(span=9, adjust=False).mean()
-st.line_chart(company_data[['MACD_Line', 'Signal_Line']])
+st.line_chart(company_data[['date', 'MACD_Line', 'Signal_Line']].set_index('date'))
