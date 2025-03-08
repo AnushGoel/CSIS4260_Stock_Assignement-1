@@ -18,7 +18,9 @@ st.set_page_config(page_title="Stock Market Dashboard", layout="wide")
 def load_data():
     data = pd.read_parquet("data.parquet")
     data = data.dropna()  # Drop null values
-    data = data[data['date'] > '1970-01-01']  # Remove incorrect default dates
+    data['date'] = pd.to_datetime(data['date'], errors='coerce')  # Convert to datetime format
+    data = data.dropna(subset=['date'])  # Remove any rows where conversion failed
+    data = data[data['date'] > pd.Timestamp('1970-01-01')]  # Now filter correct dates
     return data
 
 data = load_data()
@@ -51,7 +53,6 @@ with col2:
     st.write("### Stock Data Overview")
     company_data = data[data['name'] == selected_company]
     company_data = company_data.sort_values(by='date')
-    company_data['date'] = pd.to_datetime(company_data['date'])  # Ensure date is in datetime format
     st.dataframe(company_data.tail(10).style.format(precision=2))
 
 # Feature Selection
