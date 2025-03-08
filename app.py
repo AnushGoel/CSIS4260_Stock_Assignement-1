@@ -90,8 +90,9 @@ col3.metric("R² Score", f"{r2:.2f}")
 col4.metric("Accuracy", f"{accuracy:.2%}")
 
 # Forecast Next 15 Days
-forecast_dates = pd.date_range(start=company_data.index[-1], periods=16, freq='B')[1:]
-future_X = X_test.iloc[-15:, :]
+forecast_start_date = company_data.index[-1] + pd.Timedelta(days=1)
+forecast_dates = pd.date_range(start=forecast_start_date, periods=15, freq='B')
+future_X = X.iloc[-15:, :]
 future_forecast = model.predict(future_X)
 future_forecast = np.round(future_forecast, 2)
 
@@ -99,6 +100,12 @@ future_forecast = np.round(future_forecast, 2)
 forecast_df = pd.DataFrame({"Date": forecast_dates, "Forecasted Close": future_forecast})
 st.subheader("📅 15-Day Forecast")
 st.dataframe(forecast_df.style.format({"Forecasted Close": "{:.2f}"}))
+
+# Forecasted Chart
+st.subheader("📊 Forecasted Stock Price")
+forecast_fig = go.Figure()
+forecast_fig.add_trace(go.Scatter(x=forecast_df["Date"], y=forecast_df["Forecasted Close"], mode='lines+markers', name='Forecasted Close Price', line=dict(color='red')))
+st.plotly_chart(forecast_fig, use_container_width=True)
 
 # Candlestick Chart
 st.subheader("📊 Candlestick Chart")
