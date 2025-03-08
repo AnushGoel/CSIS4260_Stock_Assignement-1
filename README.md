@@ -32,7 +32,7 @@ The project is divided into **three main parts:**
 
 ---
 
-## 🏗️ Part 1: Storage & Retrieval ([🔗 View Notebook](https://github.com/AshmithaJagadish/CSIS-4260-Stock-Project/blob/main/Part-A%20.ipynb))
+## 🏗️ Part 1: Storage & Retrieval
 **Goal:** Compare CSV vs Parquet storage formats for efficiency.
 - ✅ Benchmark **read/write speeds**
 - ✅ Compare **file size reduction** using compression
@@ -42,7 +42,7 @@ The project is divided into **three main parts:**
 
 ---
 
-## 📊 Part 2: Data Manipulation & Prediction ([🔗 View Notebook](https://github.com/AshmithaJagadish/CSIS-4260-Stock-Project/blob/main/Part-B.ipynb))
+## 📊 Part 2: Data Manipulation & Prediction
 **Goal:** Enhance dataset with technical indicators & predict next-day closing prices.
 - ✅ Implement **4+ technical indicators** (EMA, MACD, ATR, Williams %R)
 - ✅ Compare **Pandas vs Polars** for performance
@@ -87,19 +87,3 @@ streamlit run main.py
 - [ ] Experiment with LSTM for deep learning forecasting
 - [ ] Deploy dashboard on **Streamlit Cloud**
 
----
-
-## 👨‍💻 Contributors
-- **[Your Name]** – Data Processing & Model Implementation
-- **[Your Name]** – Dashboard Development
-
-📩 For questions, contact: `your.email@example.com`
-
----
-
-## 📜 License
-This project is for educational purposes under **CSIS 4260** and is not for commercial use.
-
----
-
-🌟 **If you find this project helpful, give it a star on GitHub!** ⭐
