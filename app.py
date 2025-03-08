@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, explained_variance_score
 import joblib
 
 # Set Page Configurations
@@ -59,15 +59,17 @@ y_pred = model.predict(X_test)
 mae = mean_absolute_error(y_test, y_pred)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 r2 = r2_score(y_test, y_pred)
+accuracy = explained_variance_score(y_test, y_pred)  # Approximate accuracy
 
-# Display Metrics in One Row
+# Display Metrics in One Row with Styling
 st.subheader("📈 Model Performance Metrics")
 st.markdown(
     f"""
-    <div style="display: flex; justify-content: space-around; font-size: 20px; font-weight: bold; padding: 10px;">
-        <div>📉 MAE: {mae:.2f}</div>
-        <div>📊 RMSE: {rmse:.2f}</div>
-        <div>📈 R² Score: {r2:.2f}</div>
+    <div style="display: flex; justify-content: space-around; font-size: 18px; font-weight: bold; padding: 12px; background-color: #f8f9fa; border-radius: 8px;">
+        <div>📉 MAE: <span style='color: red;'>{mae:.2f}</span></div>
+        <div>📊 RMSE: <span style='color: blue;'>{rmse:.2f}</span></div>
+        <div>📈 R² Score: <span style='color: green;'>{r2:.2f}</span></div>
+        <div>✅ Accuracy: <span style='color: purple;'>{accuracy:.2%}</span></div>
     </div>
     """,
     unsafe_allow_html=True
@@ -79,9 +81,33 @@ future_X = X.iloc[-15:, :]
 future_forecast = np.round(model.predict(future_X), 2)
 forecast_df = pd.DataFrame({"Date": forecast_dates, "Forecasted Close": future_forecast})
 
-# Display Forecasted Values with Dates
+# Display Forecasted Values with Styled Table
 st.subheader("📅 15-Day Forecast")
-st.dataframe(forecast_df.style.format({"Forecasted Close": "{:.2f}"}))
+st.markdown("""
+<style>
+    .styled-table {
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+    }
+    .styled-table th, .styled-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    .styled-table th {
+        background-color: #f2f2f2;
+    }
+</style>
+""", unsafe_allow_html=True)
+st.markdown(f"""
+<table class='styled-table'>
+<tr><th>Date</th><th>Forecasted Close</th></tr>
+{''.join(f'<tr><td>{date}</td><td>{value:.2f}</td></tr>' for date, value in zip(forecast_df['Date'], forecast_df['Forecasted Close']))}
+</table>
+""", unsafe_allow_html=True)
 
 # Forecasted Chart
 st.subheader("📊 Forecasted Stock Price")
