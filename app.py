@@ -91,8 +91,7 @@ col3.metric("R² Score", f"{r2:.2f}")
 col4.metric("Accuracy", f"{accuracy:.2%}")
 
 # Forecast Next 15 Days
-forecast_start_date = company_data.index[-1] + pd.DateOffset(days=1)
-forecast_dates = pd.date_range(start=forecast_start_date, periods=15, freq='B').date  # Remove time component
+forecast_dates = company_data.index[-15:]  # Use actual dataset dates
 future_X = X.iloc[-15:, :]
 future_forecast = model.predict(future_X)
 future_forecast = np.round(future_forecast, 2)
